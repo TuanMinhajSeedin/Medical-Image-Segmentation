@@ -14,12 +14,14 @@ list_of_files=[
     f"src/{project_name}/components/__init__.py",
     f"src/{project_name}/data/__init__.py",
     f"src/{project_name}/utils/__init__.py",
+    f"src/{project_name}/utils/common.py",
     f"src/{project_name}/models/__init__.py",
     f"src/{project_name}/config/configuration.py",
     f"src/{project_name}/pipeline/__init__.py",
     f"src/{project_name}/entity/__init__.py",
     f"src/{project_name}/constants/__init__.py",
     f"src/{project_name}/training/__init__.py",
+    "logs/running_logs.log",
     "train.py",
     "eval.py",
     "infer.py",
@@ -29,6 +31,7 @@ list_of_files=[
     "params.yaml",
     "requirements.txt",
     "setup.py",
+    "main.py",
     "research/trials.ipynb",
     "templates/index.html"
 ]
