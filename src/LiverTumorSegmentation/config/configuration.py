@@ -4,15 +4,22 @@ from LiverTumorSegmentation.entity.config_entity import DataIngestionConfig
 from LiverTumorSegmentation.entity.config_entity import PrepareBaseModelConfig
 from LiverTumorSegmentation.entity.config_entity import TrainingConfig
 from pathlib import Path
+from typing import Optional
 
 class ConfigurationManager:
     def __init__(
         self,
         config_filepath = CONFIG_FILE_PATH,
-        params_filepath = PARAMS_FILE_PATH
+        params_filepath = PARAMS_FILE_PATH,
+        experiment_params_path: Optional[Path] = None
     ):
         self.config = read_yaml(config_filepath)
-        self.params = read_yaml(params_filepath)
+        
+        # Use experiment config if provided, otherwise use default params
+        if experiment_params_path is not None:
+            self.params = read_yaml(experiment_params_path)
+        else:
+            self.params = read_yaml(params_filepath)
 
         create_directories([self.config.artifacts_root])
 

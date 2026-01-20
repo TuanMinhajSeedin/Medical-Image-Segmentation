@@ -8,6 +8,7 @@ import tensorflow as tf
 import shutil
 
 from LiverTumorSegmentation.entity.config_entity import TrainingConfig
+from LiverTumorSegmentation.utils.common import *
 
 
 class PickleDataLoader:
@@ -424,13 +425,15 @@ class ModelTrainer:
 
     def _save_model(self, path: Path):
         """Save the trained model."""
-        path.parent.mkdir(parents=True, exist_ok=True)
+        # path.parent.mkdir(parents=True, exist_ok=True)
+        create_directories([path.parent])
         self.model.save(path)
 
     def copy_model(self):
         """Copy the trained model to the copy directory."""
         src = Path(self.config.trained_model_path)
         dst_dir = Path(self.config.copy_trained_model_path)
-        dst_dir.mkdir(parents=True, exist_ok=True)
+        # dst_dir.mkdir(parents=True, exist_ok=True)
+        create_directories([dst_dir])
         dst = dst_dir / src.name
         shutil.copy2(src, dst)
