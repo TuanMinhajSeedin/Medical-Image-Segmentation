@@ -111,6 +111,21 @@ def load_bin(path: Path) -> Any:
     logger.info(f"binary file loaded from: {path}")
     return data
 
+
+@ensure_annotations
+def load_pickle(path: Path, use_joblib: bool = True) -> Any:
+    """load pickle file (handles both pickle and joblib formats)
+
+    Args:
+        path (Path): path to pickle file
+        use_joblib: If True, try joblib first (default). If False, use pickle.
+
+    Returns:
+        Any: object stored in the file
+    """
+    from .load_pickle import load_pickle_file
+    return load_pickle_file(path, use_joblib=use_joblib)
+
 @ensure_annotations
 def get_size(path: Path) -> str:
     """get size in KB

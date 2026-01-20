@@ -1,4 +1,5 @@
 tensorflow
+# torch
 pandas 
 dvc   
 mlflow
@@ -18,4 +19,6 @@ Flask-Cors
 streamlit
 FASTAPI
 Uvicorn
+kaggle
+gdown
 -e .
