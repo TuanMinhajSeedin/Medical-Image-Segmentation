@@ -1,1 +1,17 @@
-key : val
+AUGMENTATION: True           # Data augmentation flag (not yet used by train_sample.py)
+# Input image size expected by `train_sample.py` (H, W, C)
+IMAGE_SIZE: [128, 128, 1]
+
+# Training hyperparameters aligned with TrainConfig in artifacts/sample/train_sample.py
+BATCH_SIZE: 2
+EPOCHS: 3
+LEARNING_RATE: 0.001
+
+# Number of segmentation classes (binary foreground/background for UNet)
+CLASSES: 1
+
+# Kept for compatibility with classification-based pipelines (not used by train_sample.py)
+INCLUDE_TOP: False
+WEIGHTS: null
+
+BASE_FILTERS: 32
