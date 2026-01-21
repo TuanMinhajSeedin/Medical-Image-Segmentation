@@ -1,0 +1,26 @@
+# Experiment 001 Configuration
+# Similar structure to params.yaml but can be customized per experiment
+
+AUGMENTATION: True           # Data augmentation flag
+# Input image size expected (H, W, C)
+IMAGE_SIZE: [128, 128, 1]
+
+# Training hyperparameters
+BATCH_SIZE: 2
+EPOCHS: 2
+LEARNING_RATE: 0.0125
+
+# Number of segmentation classes (binary foreground/background for UNet)
+CLASSES: 1
+
+# Kept for compatibility with classification-based pipelines
+INCLUDE_TOP: False
+WEIGHTS: null
+
+BASE_FILTERS: 32
+
+# Additional experiment-specific parameters
+PREDICTIONS_SUBDIR: Dice      # Subdirectory in Predictions folder
+VAL_SPLIT: 0.1                # Validation split ratio
+SHUFFLE_BUFFER: 128           # Shuffle buffer size for training
+

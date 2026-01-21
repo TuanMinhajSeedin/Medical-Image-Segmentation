@@ -205,11 +205,13 @@ def inspect_pickle_file(file_path: str | Path) -> dict:
 
 if __name__ == "__main__":
     import argparse
+    import numpy as np
     
     parser = argparse.ArgumentParser(description="Load and inspect pickle files")
     parser.add_argument("file_path", type=str, help="Path to pickle file")
     parser.add_argument("--inspect", action="store_true", help="Only inspect, don't load")
     parser.add_argument("--use-pickle", action="store_true", help="Force use of pickle instead of joblib")
+    parser.add_argument("--show-array", action="store_true", help="Extract and show array values (for SegmentArray/dict objects)")
     
     args = parser.parse_args()
     
@@ -227,11 +229,92 @@ if __name__ == "__main__":
             print(f"Length: {len(data)}")
         
         if hasattr(data, 'keys') and callable(data.keys):
-            print(f"Keys: {list(data.keys())[:10]}...")  # Show first 10 keys
+            keys = list(data.keys())
+            print(f"Keys: {keys[:10]}{'...' if len(keys) > 10 else ''}")
         
         if hasattr(data, 'shape'):
             print(f"Shape: {data.shape}")
         
-        print(f"\nData preview:")
-        print(data)
+        # Try to extract and show array if --show-array flag is used or if it's a SegmentArray
+        if args.show_array or 'SegmentArray' in str(type(data)):
+            try:
+                # Try to use the training module's extract functions
+                from LiverTumorSegmentation.components.training import PickleDataLoader
+                
+                # Try extracting as mask first (for GroundTruth)
+                try:
+                    arr = PickleDataLoader.extract_mask(data)
+                    print(f"\n📊 Extracted Array (as mask):")
+                    print(f"  Shape: {arr.shape}")
+                    print(f"  Dtype: {arr.dtype}")
+                    print(f"  Min: {arr.min()}, Max: {arr.max()}, Mean: {arr.mean():.6f}")
+                    print(f"  Unique values: {np.unique(arr)[:10]}{'...' if len(np.unique(arr)) > 10 else ''}")
+                    
+                    # Show array preview
+                    if arr.ndim == 3:
+                        print(f"\n  First slice ([:, :, 0]):")
+                        print(arr[:, :, 0])
+                        if arr.shape[2] > 1:
+                            print(f"\n  Middle slice ([:, :, {arr.shape[2]//2}]):")
+                            print(arr[:, :, arr.shape[2]//2])
+                    elif arr.ndim == 2:
+                        print(f"\n  Array values:")
+                        print(arr)
+                    else:
+                        print(f"\n  Array values (first 100 elements):")
+                        print(arr.flatten()[:100])
+                except Exception as mask_err:
+                    # Try extracting as array (for Predictions)
+                    try:
+                        arr = PickleDataLoader.extract_array(data)
+                        print(f"\n📊 Extracted Array (as image/prediction):")
+                        print(f"  Shape: {arr.shape}")
+                        print(f"  Dtype: {arr.dtype}")
+                        print(f"  Min: {arr.min()}, Max: {arr.max()}, Mean: {arr.mean():.6f}")
+                        
+                        # Show array preview
+                        if arr.ndim == 3:
+                            print(f"\n  First slice ([:, :, 0]):")
+                            print(arr[:, :, 0])
+                            if arr.shape[2] > 1:
+                                print(f"\n  Middle slice ([:, :, {arr.shape[2]//2}]):")
+                                print(arr[:, :, arr.shape[2]//2])
+                        elif arr.ndim == 2:
+                            print(f"\n  Array values:")
+                            print(arr)
+                        else:
+                            print(f"\n  Array values (first 100 elements):")
+                            print(arr.flatten()[:100])
+                    except Exception as array_err:
+                        print(f"\n⚠️  Could not extract array using PickleDataLoader methods")
+                        print(f"  Mask extraction error: {mask_err}")
+                        print(f"  Array extraction error: {array_err}")
+                        
+                        # Fallback: try to convert SegmentArray to numpy directly
+                        if hasattr(data, '__array__'):
+                            try:
+                                arr = np.array(data)
+                                print(f"\n📊 Converted SegmentArray to numpy array:")
+                                print(f"  Shape: {arr.shape}")
+                                print(f"  Dtype: {arr.dtype}")
+                                print(f"  Min: {arr.min()}, Max: {arr.max()}, Mean: {arr.mean():.6f}")
+                                
+                                if arr.ndim == 3:
+                                    print(f"\n  First slice ([:, :, 0]):")
+                                    print(arr[:, :, 0])
+                                elif arr.ndim == 2:
+                                    print(f"\n  Array values:")
+                                    print(arr[:20, :20] if arr.shape[0] > 20 else arr)
+                                else:
+                                    print(f"\n  Array values (first 100 elements):")
+                                    print(arr.flatten()[:100])
+                            except Exception as convert_err:
+                                print(f"  Conversion error: {convert_err}")
+            except ImportError:
+                print(f"\n⚠️  Could not import PickleDataLoader. Install dependencies or use --inspect only.")
+        
+        # Show raw data preview if not showing array
+        if not args.show_array and 'SegmentArray' not in str(type(data)):
+            print(f"\nData preview:")
+            print(data)
 

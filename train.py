@@ -1,6 +1,14 @@
 import os
+import sys
+import io
 import argparse
 from pathlib import Path
+
+# Fix encoding for Windows compatibility
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 # Silence noisy TensorFlow INFO logs in terminal output.
 # Must be set BEFORE importing tensorflow (directly or indirectly).

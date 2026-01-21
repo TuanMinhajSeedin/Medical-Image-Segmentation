@@ -1,9 +1,10 @@
 """Simple script to test MLflow remote server connection."""
 import mlflow
+import os
 from urllib.parse import urlparse
 
 
-def test_mlflow_connection(mlflow_uri: str):
+def test_mlflow_connection(mlflow_uri: str, username: str = None, password: str = None):
     """Test if MLflow remote server is accessible."""
     print(f"Testing MLflow connection to: {mlflow_uri}")
     print("-" * 60)
@@ -11,6 +12,12 @@ def test_mlflow_connection(mlflow_uri: str):
     try:
         # Set tracking URI
         mlflow.set_tracking_uri(mlflow_uri)
+        
+        # Set credentials if provided
+        if username:
+            os.environ["MLFLOW_TRACKING_USERNAME"] = username
+        if password:
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = password
         
         # Get tracking URI to verify it was set
         actual_uri = mlflow.get_tracking_uri()
@@ -46,6 +53,11 @@ def test_mlflow_connection(mlflow_uri: str):
         
     except mlflow.exceptions.MlflowException as e:
         print(f"\n✗ MLflow error: {e}")
+        if "403" in str(e):
+            print("\n⚠ Authentication failed! You need to provide credentials.")
+            print("  Set environment variables:")
+            print("  - MLFLOW_TRACKING_USERNAME")
+            print("  - MLFLOW_TRACKING_PASSWORD")
         print("\n" + "=" * 60)
         print("✗ MLflow server connection failed!")
         print("=" * 60)
@@ -74,5 +86,16 @@ if __name__ == "__main__":
             print("No MLflow URI provided. Exiting.")
             exit(1)
     
-    test_mlflow_connection(mlflow_uri)
+    # Check for credentials in environment variables or prompt user
+    username = os.getenv("MLFLOW_TRACKING_USERNAME", "").strip()
+    password = os.getenv("MLFLOW_TRACKING_PASSWORD", "").strip()
+    
+    if not username:
+        username = input("Enter DagsHub username (or press Enter to skip): ").strip() or None
+    if not password and username:
+        password = input("Enter DagsHub password/token: ").strip() or None
+    
+    test_mlflow_connection(mlflow_uri, username, password)
+
+
 

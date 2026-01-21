@@ -9,6 +9,7 @@ from box import ConfigBox
 from pathlib import Path
 from typing import Any
 import base64
+import tensorflow as tf
 
 
 
@@ -125,6 +126,43 @@ def load_pickle(path: Path, use_joblib: bool = True) -> Any:
     """
     from .load_pickle import load_pickle_file
     return load_pickle_file(path, use_joblib=use_joblib)
+
+def load_model(self) -> tf.keras.Model:
+    """Load the trained segmentation model with custom objects."""
+    model_path = Path(self.config.training.trained_model_path)
+    
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model not found: {model_path}")
+    
+    logger.info(f"Loading model from: {model_path}")
+    
+    model = tf.keras.models.load_model(
+        model_path,
+        custom_objects={
+            "SegmentationLoss": SegmentationLoss,
+            "CombinedLossMetric": CombinedLossMetric,
+            "DiceMetric": DiceMetric,
+            "IoUMetric": IoUMetric,
+            "combined_loss": SegmentationLoss.combined_loss,
+            "dice_loss": SegmentationLoss.dice_loss,
+        },
+        compile=False,
+    )
+    
+    # Recompile for inference (optional, but ensures metrics work if needed)
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(),
+        loss=SegmentationLoss.combined_loss,
+        metrics=[
+            CombinedLossMetric(name="combined_loss"),
+            DiceMetric(name="dice"),
+            IoUMetric(name="iou"),
+        ],
+    )
+    
+    self.model = model
+    logger.info("Model loaded successfully")
+    return model
 
 @ensure_annotations
 def get_size(path: Path) -> str:

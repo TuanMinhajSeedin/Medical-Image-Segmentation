@@ -6,6 +6,8 @@ import types
 import numpy as np
 import tensorflow as tf
 import shutil
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from LiverTumorSegmentation.entity.config_entity import TrainingConfig
 from LiverTumorSegmentation.utils.common import *
@@ -472,6 +474,134 @@ class ModelTrainer:
         
         print(f"Created datasets: {len(train_idx)} training samples, {len(val_idx)} validation samples")
     
+    @staticmethod
+    def plot_training_history(history, plot_dir: Path):
+        """
+        Plot training history and save the plots
+        
+        Args:
+            history: Training history object from model.fit()
+            plot_dir: Directory to save the plots
+        """
+        # Create plots directory if it doesn't exist
+        plot_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Set style for better-looking plots
+        sns.set_style("darkgrid")
+        
+        # Extract metrics from history
+        metrics = list(history.history.keys())
+        loss_metric = [m for m in metrics if 'loss' in m and 'val_' not in m][0] if any('loss' in m and 'val_' not in m for m in metrics) else None
+        val_loss_metric = [m for m in metrics if 'val_loss' in m][0] if any('val_loss' in m for m in metrics) else None
+        dice_metric = [m for m in metrics if 'dice' in m and 'val_' not in m][0] if any('dice' in m and 'val_' not in m for m in metrics) else None
+        val_dice_metric = [m for m in metrics if 'val_dice' in m][0] if any('val_dice' in m for m in metrics) else None
+        
+        # Create a figure with subplots
+        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+        
+        # Plot 1: Loss
+        if loss_metric and val_loss_metric:
+            axes[0, 0].plot(history.history[loss_metric], label='Training Loss', linewidth=2)
+            axes[0, 0].plot(history.history[val_loss_metric], label='Validation Loss', linewidth=2)
+            axes[0, 0].set_title('Model Loss', fontsize=14, fontweight='bold')
+            axes[0, 0].set_xlabel('Epoch', fontsize=12)
+            axes[0, 0].set_ylabel('Loss', fontsize=12)
+            axes[0, 0].legend(fontsize=11)
+            axes[0, 0].grid(True, alpha=0.3)
+        
+        # Plot 2: Combined Loss
+        if 'combined_loss' in metrics or 'val_combined_loss' in metrics:
+            combined_metric = 'combined_loss' if 'combined_loss' in metrics else None
+            val_combined_metric = 'val_combined_loss' if 'val_combined_loss' in metrics else None
+            if combined_metric and val_combined_metric:
+                axes[0, 1].plot(history.history[combined_metric], label='Training Combined Loss', linewidth=2)
+                axes[0, 1].plot(history.history[val_combined_metric], label='Validation Combined Loss', linewidth=2)
+                axes[0, 1].set_title('Combined Loss (BCE + Dice)', fontsize=14, fontweight='bold')
+                axes[0, 1].set_xlabel('Epoch', fontsize=12)
+                axes[0, 1].set_ylabel('Loss', fontsize=12)
+                axes[0, 1].legend(fontsize=11)
+                axes[0, 1].grid(True, alpha=0.3)
+        
+        # Plot 3: Dice Metric
+        if dice_metric and val_dice_metric:
+            axes[1, 0].plot(history.history[dice_metric], label='Training Dice', linewidth=2)
+            axes[1, 0].plot(history.history[val_dice_metric], label='Validation Dice', linewidth=2)
+            axes[1, 0].set_title('Dice Coefficient', fontsize=14, fontweight='bold')
+            axes[1, 0].set_xlabel('Epoch', fontsize=12)
+            axes[1, 0].set_ylabel('Dice', fontsize=12)
+            axes[1, 0].legend(fontsize=11)
+            axes[1, 0].grid(True, alpha=0.3)
+        
+        # Plot 4: IoU Metric
+        if 'iou' in metrics or 'val_iou' in metrics:
+            iou_metric = 'iou' if 'iou' in metrics else None
+            val_iou_metric = 'val_iou' if 'val_iou' in metrics else None
+            if iou_metric and val_iou_metric:
+                axes[1, 1].plot(history.history[iou_metric], label='Training IoU', linewidth=2)
+                axes[1, 1].plot(history.history[val_iou_metric], label='Validation IoU', linewidth=2)
+                axes[1, 1].set_title('Intersection over Union (IoU)', fontsize=14, fontweight='bold')
+                axes[1, 1].set_xlabel('Epoch', fontsize=12)
+                axes[1, 1].set_ylabel('IoU', fontsize=12)
+                axes[1, 1].legend(fontsize=11)
+                axes[1, 1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        
+        # Save the combined plot
+        plot_path = plot_dir / 'training_history.png'
+        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        print(f"Training history plot saved at: {plot_path}")
+        plt.close()
+        
+        # Create separate detailed plots
+        # Loss plot
+        if loss_metric and val_loss_metric:
+            plt.figure(figsize=(10, 6))
+            plt.plot(history.history[loss_metric], label='Training Loss', linewidth=2.5, marker='o', markersize=4)
+            plt.plot(history.history[val_loss_metric], label='Validation Loss', linewidth=2.5, marker='s', markersize=4)
+            plt.title('Training and Validation Loss', fontsize=16, fontweight='bold')
+            plt.xlabel('Epoch', fontsize=12)
+            plt.ylabel('Loss', fontsize=12)
+            plt.legend(fontsize=11)
+            plt.grid(True, alpha=0.3)
+            loss_plot_path = plot_dir / 'loss_plot.png'
+            plt.savefig(loss_plot_path, dpi=300, bbox_inches='tight')
+            print(f"Loss plot saved at: {loss_plot_path}")
+            plt.close()
+        
+        # Dice plot
+        if dice_metric and val_dice_metric:
+            plt.figure(figsize=(10, 6))
+            plt.plot(history.history[dice_metric], label='Training Dice', linewidth=2.5, marker='o', markersize=4)
+            plt.plot(history.history[val_dice_metric], label='Validation Dice', linewidth=2.5, marker='s', markersize=4)
+            plt.title('Training and Validation Dice Coefficient', fontsize=16, fontweight='bold')
+            plt.xlabel('Epoch', fontsize=12)
+            plt.ylabel('Dice', fontsize=12)
+            plt.legend(fontsize=11)
+            plt.grid(True, alpha=0.3)
+            dice_plot_path = plot_dir / 'dice_plot.png'
+            plt.savefig(dice_plot_path, dpi=300, bbox_inches='tight')
+            print(f"Dice plot saved at: {dice_plot_path}")
+            plt.close()
+        
+        # IoU plot
+        if 'iou' in metrics or 'val_iou' in metrics:
+            iou_metric = 'iou' if 'iou' in metrics else None
+            val_iou_metric = 'val_iou' if 'val_iou' in metrics else None
+            if iou_metric and val_iou_metric:
+                plt.figure(figsize=(10, 6))
+                plt.plot(history.history[iou_metric], label='Training IoU', linewidth=2.5, marker='o', markersize=4)
+                plt.plot(history.history[val_iou_metric], label='Validation IoU', linewidth=2.5, marker='s', markersize=4)
+                plt.title('Training and Validation IoU', fontsize=16, fontweight='bold')
+                plt.xlabel('Epoch', fontsize=12)
+                plt.ylabel('IoU', fontsize=12)
+                plt.legend(fontsize=11)
+                plt.grid(True, alpha=0.3)
+                iou_plot_path = plot_dir / 'iou_plot.png'
+                plt.savefig(iou_plot_path, dpi=300, bbox_inches='tight')
+                print(f"IoU plot saved at: {iou_plot_path}")
+                plt.close()
+    
     def train(self):
         """Train the model."""
         if self.train_dataset is None or self.val_dataset is None:
@@ -489,12 +619,16 @@ class ModelTrainer:
             verbose=1,
         )
 
-        self.model.fit(
+        history = self.model.fit(
             self.train_dataset,
             validation_data=self.val_dataset,
             epochs=self.config.params_epochs,
             callbacks=[checkpoint_cb],
         )
+        
+        # Generate plots from training history
+        plots_dir = Path(self.config.trained_model_path).parent / 'plots'
+        self.plot_training_history(history, plots_dir)
 
 
     def copy_model(self):

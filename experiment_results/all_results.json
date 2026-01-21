@@ -1,0 +1,56 @@
+{
+    "exp_000": {
+        "config_path": "configs\\exp_000.yaml",
+        "training_success": true,
+        "evaluation_success": true,
+        "mlflow_success": true,
+        "scores": {
+            "loss": 0.950108528137207,
+            "combined_loss": 0.7600868344306946,
+            "dice": 0.08666646480560303,
+            "iou": 0.0508749783039093
+        },
+        "config_params": {
+            "batch_size": 2,
+            "epochs": 10,
+            "learning_rate": 0.001,
+            "base_filters": 32
+        }
+    },
+    "exp_001": {
+        "config_path": "configs\\exp_001.yaml",
+        "training_success": true,
+        "evaluation_success": true,
+        "mlflow_success": true,
+        "scores": {
+            "loss": 0.9928579926490784,
+            "combined_loss": 0.7942863702774048,
+            "dice": 0.08838481456041336,
+            "iou": 0.050389088690280914
+        },
+        "config_params": {
+            "batch_size": 2,
+            "epochs": 10,
+            "learning_rate": 0.002,
+            "base_filters": 32
+        }
+    },
+    "exp_002": {
+        "config_path": "configs\\exp_002.yaml",
+        "training_success": true,
+        "evaluation_success": true,
+        "mlflow_success": true,
+        "scores": {
+            "loss": 1.3606963157653809,
+            "combined_loss": 1.0885570049285889,
+            "dice": 0.05080000311136246,
+            "iou": 0.026841405779123306
+        },
+        "config_params": {
+            "batch_size": 2,
+            "epochs": 5,
+            "learning_rate": 0.001,
+            "base_filters": 64
+        }
+    }
+}

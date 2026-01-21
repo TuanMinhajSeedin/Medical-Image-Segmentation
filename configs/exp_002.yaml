@@ -1,0 +1,30 @@
+# Experiment 002: Loss Tweak / Encoder / etc.
+# Modifies loss function or encoder architecture
+
+AUGMENTATION: True           # Keep augmentations enabled
+# Input image size expected (H, W, C)
+IMAGE_SIZE: [128, 128, 1]
+
+# Training hyperparameters
+BATCH_SIZE: 2
+EPOCHS: 5
+LEARNING_RATE: 0.001
+
+# Number of segmentation classes (binary foreground/background for UNet)
+CLASSES: 1
+
+# Kept for compatibility with classification-based pipelines
+INCLUDE_TOP: False
+WEIGHTS: null
+
+BASE_FILTERS: 64            # Increased encoder filters (from 32 to 64)
+
+# Additional experiment-specific parameters
+PREDICTIONS_SUBDIR: Dice      # Subdirectory in Predictions folder
+VAL_SPLIT: 0.1                # Validation split ratio
+SHUFFLE_BUFFER: 128           # Shuffle buffer size for training
+
+# Loss function modifications (if implemented)
+# LOSS_TYPE: dice_only        # Alternative: Use only Dice loss instead of BCE+Dice
+# LOSS_ALPHA: 0.5             # Weight for combining losses (if applicable)
+

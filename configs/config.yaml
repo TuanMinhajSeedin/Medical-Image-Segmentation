@@ -25,3 +25,9 @@ evaluation:
   path_of_model: artifacts/training/model.h5
   training_data: artifacts/data_ingestion/data
   mlflow_uri: https://dagshub.com/TuanMinhajSeedin/Medical-Image-Segmentation.mlflow
+
+prediction:
+  root_dir: artifacts/prediction
+  prediction_data: artifacts/prediction
+  results_data: artifacts/prediction/results
+  pickle_file_path: artifacts/data_ingestion/data/Predictions/Dice/3.pkl

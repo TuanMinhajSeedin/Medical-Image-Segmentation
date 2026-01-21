@@ -1,7 +1,16 @@
 """CLI entrypoint to run evaluation with optional params/ckpt overrides."""
 
 import argparse
+import os
+import sys
+import io
 from pathlib import Path
+
+# Fix encoding for Windows compatibility
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 from LiverTumorSegmentation.config.configuration import ConfigurationManager
 from LiverTumorSegmentation.components.evaluation import SegmentationEvaluator
@@ -39,4 +48,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
