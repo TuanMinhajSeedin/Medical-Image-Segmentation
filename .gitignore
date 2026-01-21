@@ -209,3 +209,9 @@ __marimo__/
 
 artifacts/data_ingestion/data/*
 artifacts/sample/*
+artifacts/training/model.h5
+artifacts/training/model.keras
+
+# MLflow local tracking
+mlruns/
+.mlflow/

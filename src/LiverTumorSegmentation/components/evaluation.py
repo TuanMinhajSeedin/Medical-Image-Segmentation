@@ -150,6 +150,8 @@ class SegmentationEvaluator:
             if self.model is not None:
                 # Model registry does not work with file store
                 # Try to register for non-file stores, but fall back to logging without registration if it fails
+                
+                """
                 if tracking_url_type_store != "file":
                     try:
                         # Attempt to register the model
@@ -166,5 +168,8 @@ class SegmentationEvaluator:
                 else:
                     # Log model without registration for file store
                     mlflow.keras.log_model(self.model, "model")
+
+                """
+                mlflow.keras.log_model(self.model, "model")
 
         print(f"Evaluation results logged to MLflow: {mlflow.get_tracking_uri()}")

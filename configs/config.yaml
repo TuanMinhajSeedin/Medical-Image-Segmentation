@@ -24,7 +24,8 @@ training:
 evaluation:
   path_of_model: artifacts/training/model.h5
   training_data: artifacts/data_ingestion/data
-  mlflow_uri: https://dagshub.com/TuanMinhajSeedin/Medical-Image-Segmentation.mlflow
+  # mlflow_uri: https://dagshub.com/TuanMinhajSeedin/Medical-Image-Segmentation.mlflow
+  mlflow_uri: ./mlruns
 
 prediction:
   root_dir: artifacts/prediction

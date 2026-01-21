@@ -4,8 +4,8 @@ IMAGE_SIZE: [128, 128, 1]
 
 # Training hyperparameters aligned with TrainConfig in artifacts/sample/train_sample.py
 BATCH_SIZE: 2
-EPOCHS: 50
-LEARNING_RATE: 0.001
+EPOCHS: 2
+LEARNING_RATE: 0.002
 
 # Number of segmentation classes (binary foreground/background for UNet)
 CLASSES: 1

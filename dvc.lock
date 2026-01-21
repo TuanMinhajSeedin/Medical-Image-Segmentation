@@ -5,8 +5,8 @@ stages:
     deps:
     - path: configs/config.yaml
       hash: md5
-      md5: c16b26b24dbdab483ace23e6502cee33
-      size: 1074
+      md5: ea8ccf3c530846fdeaae0abeaaffa9a0
+      size: 1308
     - path: src/LiverTumorSegmentation/pipeline/stage_01_data_ingestion.py
       hash: md5
       md5: 70ac3f171aaa869891ed5f350769a9cf
@@ -23,8 +23,8 @@ stages:
     deps:
     - path: configs/config.yaml
       hash: md5
-      md5: c16b26b24dbdab483ace23e6502cee33
-      size: 1074
+      md5: ea8ccf3c530846fdeaae0abeaaffa9a0
+      size: 1308
     - path: src/LiverTumorSegmentation/pipeline/stage_02_prepare_base_model.py
       hash: md5
       md5: 69ab9128838afb2079ef52cd27b38597
@@ -34,22 +34,22 @@ stages:
     deps:
     - path: artifacts/data_ingestion
       hash: md5
-      md5: 31c47e73e343af9ce0fe29c699a0cdd5.dir
-      size: 1352793580
-      nfiles: 2959
+      md5: 1bb8cd916b762656fbcfb1c36e534300.dir
+      size: 1352793587
+      nfiles: 2960
     - path: artifacts/prepare_base_model
       hash: md5
-      md5: ad09c259f288820ac86bd80955121c02.dir
+      md5: 6f2fbe88873af34ae7ff063b58a20231.dir
       size: 4048190
       nfiles: 2
     - path: configs/config.yaml
       hash: md5
-      md5: c16b26b24dbdab483ace23e6502cee33
-      size: 1074
+      md5: ea8ccf3c530846fdeaae0abeaaffa9a0
+      size: 1308
     - path: configs/params.yaml
       hash: md5
-      md5: 6c9580610ec1a9aa790330aa42d8b3d4
-      size: 551
+      md5: 33a9f6006eb49224b98a2b6a89c81385
+      size: 550
     - path: src/LiverTumorSegmentation/pipeline/stage_03_model_training.py
       hash: md5
       md5: da43928e513b588e81d6ddfe3d02c261
@@ -57,28 +57,28 @@ stages:
     outs:
     - path: artifacts/training/model.h5
       hash: md5
-      md5: 7984ec5c4c2fed0e8284a586b9881be9
+      md5: 4a4d0efe58161ad6de046c565894d93b
       size: 5806240
   evaluation:
     cmd: python src/LiverTumorSegmentation/pipeline/stage_04_model_evaluation.py
     deps:
     - path: artifacts/data_ingestion
       hash: md5
-      md5: 31c47e73e343af9ce0fe29c699a0cdd5.dir
-      size: 1352793580
-      nfiles: 2959
+      md5: 1bb8cd916b762656fbcfb1c36e534300.dir
+      size: 1352793587
+      nfiles: 2960
     - path: artifacts/training/model.h5
       hash: md5
-      md5: 7984ec5c4c2fed0e8284a586b9881be9
+      md5: 4a4d0efe58161ad6de046c565894d93b
       size: 5806240
     - path: configs/config.yaml
       hash: md5
-      md5: c16b26b24dbdab483ace23e6502cee33
-      size: 1074
+      md5: ea8ccf3c530846fdeaae0abeaaffa9a0
+      size: 1308
     - path: configs/params.yaml
       hash: md5
-      md5: 6c9580610ec1a9aa790330aa42d8b3d4
-      size: 551
+      md5: 33a9f6006eb49224b98a2b6a89c81385
+      size: 550
     - path: src/LiverTumorSegmentation/pipeline/stage_04_model_evaluation.py
       hash: md5
       md5: 253b0a08085bc14ab4b0511578412530
@@ -86,5 +86,5 @@ stages:
     outs:
     - path: scores.json
       hash: md5
-      md5: 5c16bafcdc032cb1e928c8d1cc7d060c
-      size: 144
+      md5: d0cb4b85ef59b228a80717f0bbd6d941
+      size: 147
