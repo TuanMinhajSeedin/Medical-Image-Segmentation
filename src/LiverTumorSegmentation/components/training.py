@@ -260,6 +260,64 @@ class CombinedLossMetric(tf.keras.metrics.Mean):
         return super().update_state(value, sample_weight=sample_weight)
 
 
+class DiceMetric(tf.keras.metrics.Metric):
+    """Dice coefficient metric computed from logits."""
+
+    def __init__(self, name: str = "dice", eps: float = 1e-6, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.eps = eps
+        self.total = self.add_weight(name="total", initializer="zeros")
+        self.count = self.add_weight(name="count", initializer="zeros")
+
+    def update_state(self, y_true, y_pred_logits, sample_weight=None):
+        y_pred = tf.nn.sigmoid(y_pred_logits)
+        numerator = 2.0 * tf.reduce_sum(y_true * y_pred, axis=(1, 2, 3))
+        denominator = tf.reduce_sum(y_true + y_pred, axis=(1, 2, 3)) + self.eps
+        dice = numerator / denominator
+        value = tf.reduce_mean(dice)
+        if sample_weight is not None:
+            sample_weight = tf.cast(sample_weight, dtype=value.dtype)
+            value *= sample_weight
+        self.total.assign_add(value)
+        self.count.assign_add(1.0)
+
+    def result(self):
+        return tf.math.divide_no_nan(self.total, self.count)
+
+    def reset_states(self):
+        self.total.assign(0.0)
+        self.count.assign(0.0)
+
+
+class IoUMetric(tf.keras.metrics.Metric):
+    """Intersection-over-Union metric computed from logits."""
+
+    def __init__(self, name: str = "iou", eps: float = 1e-6, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.eps = eps
+        self.total = self.add_weight(name="total", initializer="zeros")
+        self.count = self.add_weight(name="count", initializer="zeros")
+
+    def update_state(self, y_true, y_pred_logits, sample_weight=None):
+        y_pred = tf.nn.sigmoid(y_pred_logits)
+        intersection = tf.reduce_sum(y_true * y_pred, axis=(1, 2, 3))
+        union = tf.reduce_sum(y_true + y_pred - y_true * y_pred, axis=(1, 2, 3)) + self.eps
+        iou = intersection / union
+        value = tf.reduce_mean(iou)
+        if sample_weight is not None:
+            sample_weight = tf.cast(sample_weight, dtype=value.dtype)
+            value *= sample_weight
+        self.total.assign_add(value)
+        self.count.assign_add(1.0)
+
+    def result(self):
+        return tf.math.divide_no_nan(self.total, self.count)
+
+    def reset_states(self):
+        self.total.assign(0.0)
+        self.count.assign(0.0)
+
+
 # ============================================================================
 # Dataset Builder Class
 # ============================================================================
@@ -363,7 +421,11 @@ class ModelTrainer:
         self.model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
             loss=SegmentationLoss.combined_loss,
-            metrics=[CombinedLossMetric(name="combined_loss")],
+            metrics=[
+                CombinedLossMetric(name="combined_loss"),
+                DiceMetric(name="dice"),
+                IoUMetric(name="iou"),
+            ],
         )
 
     def prepare_datasets(
@@ -415,19 +477,25 @@ class ModelTrainer:
         if self.train_dataset is None or self.val_dataset is None:
             raise ValueError("Datasets not initialized. Call prepare_datasets() first.")
 
+        # Ensure checkpoint directory exists
+        create_directories([self.config.trained_model_path.parent])
+
+        checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
+            filepath=str(self.config.trained_model_path),
+            monitor="val_dice",
+            mode="max",
+            save_best_only=True,
+            save_weights_only=False,
+            verbose=1,
+        )
+
         self.model.fit(
             self.train_dataset,
             validation_data=self.val_dataset,
-            epochs=self.config.params_epochs
+            epochs=self.config.params_epochs,
+            callbacks=[checkpoint_cb],
         )
 
-        self._save_model(self.config.trained_model_path)
-
-    def _save_model(self, path: Path):
-        """Save the trained model."""
-        # path.parent.mkdir(parents=True, exist_ok=True)
-        create_directories([path.parent])
-        self.model.save(path)
 
     def copy_model(self):
         """Copy the trained model to the copy directory."""

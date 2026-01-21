@@ -12,3 +12,5 @@ python -m src.LiverTumorSegmentation.data.download_subset `
 Write-Host "Subset extraction complete! Check artifacts/data_subset/"
 
 
+
+

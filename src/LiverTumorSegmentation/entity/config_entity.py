@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -39,3 +40,15 @@ class TrainingConfig:
     params_batch_size: int
     params_is_augmentation: bool
     params_image_size: list
+
+@dataclass(frozen=True)
+class EvaluationConfig:
+    """Config for evaluating a trained segmentation model."""
+
+    model_path: Path
+    training_data: Path
+    image_size: list  # [H, W, C]
+    batch_size: int
+    predictions_subdir: str = "Dice"
+    val_split: float = 0.1
+    mlflow_uri: Optional[str] = None

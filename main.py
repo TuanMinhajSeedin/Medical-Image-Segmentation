@@ -9,6 +9,7 @@ os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
 from LiverTumorSegmentation.pipeline.stage_01_data_ingestion import DataIngestionTrainingPipeline
 from LiverTumorSegmentation.pipeline.stage_02_prepare_base_model import PrepareBaseModelTrainingPipeline
 from LiverTumorSegmentation.pipeline.stage_03_model_training import ModelTrainingPipeline
+from LiverTumorSegmentation.pipeline.stage_04_model_evaluation import EvaluationPipeline
 from LiverTumorSegmentation import logger
 
 
@@ -36,6 +37,17 @@ STAGE_NAME="Training Stage"
 try:
     logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<")
     obj = ModelTrainingPipeline()
+    obj.main()
+    logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<")
+except Exception as e:
+    logger.exception(e)
+    raise e
+
+
+STAGE_NAME="Evaluation Stage"
+try:
+    logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<")
+    obj = EvaluationPipeline()
     obj.main()
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<")
 except Exception as e:

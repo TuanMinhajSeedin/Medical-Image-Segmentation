@@ -1,0 +1,20 @@
+artifact_path: file:F:/Personal Project/Medical-Image-Segmentation/mlruns/0/models/m-72ea3fb855914f25a863046acb31ac9a/artifacts
+flavors:
+  keras:
+    data: data
+    keras_backend: tensorflow
+    keras_version: 3.13.1
+    save_exported_model: false
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.keras
+    python_version: 3.13.11
+mlflow_version: 3.8.1
+model_id: m-72ea3fb855914f25a863046acb31ac9a
+model_size_bytes: 2017355
+model_uuid: m-72ea3fb855914f25a863046acb31ac9a
+prompts: null
+run_id: 35e1925f5f024d0c81b1b574500c259d
+utc_time_created: '2026-01-21 06:19:24.534702'

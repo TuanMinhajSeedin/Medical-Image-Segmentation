@@ -18,5 +18,10 @@ prepare_base_model:
 training:
   root_dir: artifacts/training
   trained_model_path: artifacts/training/model.h5
-  copy_trained_model_path: src/LiverTumorSegmentation/data/artifacts/training
+  copy_trained_model_path: src/LiverTumorSegmentation/training
   training_data: artifacts/data_ingestion/data
+
+evaluation:
+  path_of_model: artifacts/training/model.h5
+  training_data: artifacts/data_ingestion/data
+  mlflow_uri: https://dagshub.com/TuanMinhajSeedin/Medical-Image-Segmentation.mlflow

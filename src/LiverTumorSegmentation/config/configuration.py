@@ -3,6 +3,7 @@ from LiverTumorSegmentation.utils.common import read_yaml, create_directories
 from LiverTumorSegmentation.entity.config_entity import DataIngestionConfig
 from LiverTumorSegmentation.entity.config_entity import PrepareBaseModelConfig
 from LiverTumorSegmentation.entity.config_entity import TrainingConfig
+from LiverTumorSegmentation.entity.config_entity import EvaluationConfig
 from pathlib import Path
 from typing import Optional
 
@@ -82,3 +83,35 @@ class ConfigurationManager:
                     params_is_augmentation=params.AUGMENTATION,
                     params_image_size=params.IMAGE_SIZE
             )
+
+    def get_default_eval_config(self, ckpt_path: Optional[Path] = None) -> EvaluationConfig:
+        """Load evaluation config using the project ConfigurationManager.
+
+        Args:
+            ckpt_path: Optional override for the trained model path.
+        """
+        params = self.params
+
+        # Prefer explicit evaluation section if present, else fall back to training config.
+        eval_section = getattr(self.config, "evaluation", None)
+        training_cfg = self.config.training
+
+        model_path = Path(getattr(eval_section, "path_of_model", training_cfg.trained_model_path)) if eval_section else Path(training_cfg.trained_model_path)
+        if ckpt_path is not None:
+            model_path = Path(ckpt_path)
+        training_data = Path(getattr(eval_section, "training_data", training_cfg.training_data)) if eval_section else Path(training_cfg.training_data)
+        mlflow_uri = getattr(eval_section, "mlflow_uri", None) if eval_section else None
+
+        # Optional overrides from params or eval section (with safe defaults).
+        predictions_subdir = getattr(eval_section, "predictions_subdir", getattr(params, "PREDICTIONS_SUBDIR", "Dice"))
+        val_split = float(getattr(eval_section, "val_split", getattr(params, "VAL_SPLIT", 0.1)))
+
+        return EvaluationConfig(
+            model_path=model_path,
+            training_data=training_data,
+            image_size=params.IMAGE_SIZE,
+            batch_size=params.BATCH_SIZE,
+            predictions_subdir=predictions_subdir,
+            val_split=val_split,
+            mlflow_uri=mlflow_uri,
+        )
